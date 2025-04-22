@@ -1,0 +1,129 @@
+# Dependencies
+**/node_modules
+**/.pnp
+**/.pnp.js
+**/.bin
+
+# Testing
+**/coverage
+
+# Production
+**/build
+**/dist
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# .NET
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+.vs/
+*.cache
+*.pidb
+*.ncrunchsolution
+*.ncrunchproject
+*.DotSettings.user
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+*.cache.meta
+*.suo.meta
+*.user.meta
+*.userosscache.meta
+*.sln.docstates
+*.userprefs.meta
+*.lock.json
+*.dll
+*.exe
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.svclog
+*.scc
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+*.VC.db-shm
+*.VC.db-wal
+
+# Dependencies
+**/node_modules
+**/.pnp
+**/.pnp.js
+
+# Testing
+**/coverage
+
+# Production
+**/build
+**/dist
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 

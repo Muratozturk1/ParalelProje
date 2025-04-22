@@ -12,9 +12,12 @@
     },
     "scripts": {
         "start": "react-scripts start",
-        "build": "react-scripts build",
+        "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
         "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "analyze": "source-map-explorer 'build/static/js/*.js'",
+        "clean": "rimraf build node_modules",
+        "prebuild": "npm run clean"
     },
     "eslintConfig": {
         "extends": [
@@ -34,5 +37,9 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "http://localhost:5000"
+    "proxy": "http://localhost:5000",
+    "devDependencies": {
+        "rimraf": "^5.0.5",
+        "source-map-explorer": "^2.5.3"
+    }
 }
