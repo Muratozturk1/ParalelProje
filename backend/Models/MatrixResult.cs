@@ -8,6 +8,7 @@ namespace backend.Models
         public double[,]? ResultMatrix { get; set; }
 
         public double ExecutionTime { get; set; }
+        public double EnergyConsumption { get; set; } // Joule cinsinden enerji tüketimi
         public string Algorithm { get; set; } = string.Empty;
         public int Size { get; set; }
         public int ThreadCount { get; set; }
@@ -19,7 +20,7 @@ namespace backend.Models
             get
             {
                 if (ResultMatrix == null) return null;
-                
+
                 int size = ResultMatrix.GetLength(0);
                 var result = new double[size][];
                 for (int i = 0; i < size; i++)
@@ -34,4 +35,4 @@ namespace backend.Models
             }
         }
     }
-} 
+}

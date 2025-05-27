@@ -16,7 +16,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("multiply")]
-        public IActionResult Multiply([FromBody] MatrixRequest request)
+        public async Task<IActionResult> Multiply([FromBody] MatrixRequest request)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace backend.Controllers
                     return BadRequest("Thread sayısı 0'dan büyük olmalıdır.");
                 }
 
-                var result = _matrixService.MultiplyMatrices(request);
+                var result = await _matrixService.MultiplyMatrices(request);
 
                 if (!string.IsNullOrEmpty(result.Error))
                 {
@@ -53,8 +53,33 @@ namespace backend.Controllers
                 new { id = "sequential", name = "Sequential Algorithm" },
                 new { id = "basic_parallel", name = "Basic Parallel Algorithm" },
                 new { id = "improved_parallel", name = "Improved Parallel Algorithm" },
-                new { id = "block_based", name = "Block-Based Parallel Algorithm" }
+                new { id = "block_based", name = "Block-Based Parallel Algorithm" },
+                new { id = "async_parallel", name = "Async Parallel Algorithm" }
             });
         }
+
+        [HttpGet("optimize")]
+        public async Task<IActionResult> OptimizeThreadCount([FromQuery] int matrixSize, [FromQuery] int maxThreadCount = 32)
+        {
+            try
+            {
+                if (matrixSize <= 0)
+                {
+                    return BadRequest("Matris boyutu 0'dan büyük olmalıdır.");
+                }
+
+                if (maxThreadCount <= 0)
+                {
+                    return BadRequest("Maksimum thread sayısı 0'dan büyük olmalıdır.");
+                }
+
+                var result = await _matrixService.FindOptimalThreadCount(matrixSize, maxThreadCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Sunucu hatası: {ex.Message}");
+            }
+        }
     }
-} 
+}

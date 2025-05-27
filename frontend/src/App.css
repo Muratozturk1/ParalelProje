@@ -47,6 +47,20 @@
 .result-card .col {
     padding-right: 2px;
     padding-left: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.result-card .col > div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result-card .text-primary {
+    font-size: 0.85em;
+    margin-top: 0.1rem;
 }
 
 .past-results {
@@ -120,6 +134,14 @@
     font-size: 1.2em;
     color: #343a40;
     font-weight: 600;
+}
+
+.algorithm-badge.async-badge {
+    background-color: #9b59b6;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
 }
 
 @media (max-width: 768px) {

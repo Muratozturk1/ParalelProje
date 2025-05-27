@@ -3,8 +3,15 @@ import React, { useState } from 'react';
 function ResultTable({ data }) {
     const [showDetails, setShowDetails] = useState(false);
 
-    // Zaman değerlerini formatlamak için yardımcı fonksiyon
-    const formatTime = (value) => value.toFixed(6);
+    const formatTime = (value) => {
+        if (value === 0 || value === undefined) return '0.000000';
+        return value.toFixed(6);
+    };
+
+    const formatEnergy = (value) => {
+        if (value === 0 || value === undefined) return '0.00';
+        return value.toFixed(2);
+    };
 
     return (
         <div className="table-responsive">
@@ -12,9 +19,10 @@ function ResultTable({ data }) {
                 <thead className="table-dark">
                     <tr>
                         <th>Algoritma</th>
-                        <th>Çalışma Süresi (sn)</th>
+                        <th>Çalışma Süresi (s)</th>
                         <th>Hızlanma (Speedup)</th>
-                        <th>Verimlilik</th>
+                        <th>Verimlilik (%)</th>
+                        <th>Enerji Tüketimi (Joule)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -22,33 +30,46 @@ function ResultTable({ data }) {
                         <td>
                             <span className="algorithm-badge sequential-badge">Sequential</span>
                         </td>
-                        <td>{formatTime(data.sequential.time)}</td>
-                        <td>{data.sequential.speedup.toFixed(2)}x</td>
-                        <td>-</td>
+                        <td>{formatTime(data.sequential?.time)}</td>
+                        <td>{data.sequential?.speedup?.toFixed(2) || '1.00'}x</td>
+                        <td>{data.sequential?.efficiency?.toFixed(2) || '100.00'}</td>
+                        <td>{formatEnergy(data.sequential?.energy)}</td>
                     </tr>
                     <tr>
                         <td>
                             <span className="algorithm-badge parallel-badge">Basic Parallel</span>
                         </td>
-                        <td>{formatTime(data.parallel.time)}</td>
-                        <td>{data.parallel.speedup.toFixed(2)}x</td>
-                        <td>{(data.parallel.speedup / data.availableThreads * 100).toFixed(1)}%</td>
+                        <td>{formatTime(data.parallel?.time)}</td>
+                        <td>{data.parallel?.speedup?.toFixed(2) || '0.00'}x</td>
+                        <td>{data.parallel?.efficiency?.toFixed(2) || '0.00'}</td>
+                        <td>{formatEnergy(data.parallel?.energy)}</td>
                     </tr>
                     <tr>
                         <td>
                             <span className="algorithm-badge improved-badge">Improved Parallel</span>
                         </td>
-                        <td>{formatTime(data.improved.time)}</td>
-                        <td>{data.improved.speedup.toFixed(2)}x</td>
-                        <td>{(data.improved.speedup / data.availableThreads * 100).toFixed(1)}%</td>
+                        <td>{formatTime(data.improved?.time)}</td>
+                        <td>{data.improved?.speedup?.toFixed(2) || '0.00'}x</td>
+                        <td>{data.improved?.efficiency?.toFixed(2) || '0.00'}</td>
+                        <td>{formatEnergy(data.improved?.energy)}</td>
                     </tr>
                     <tr>
                         <td>
                             <span className="algorithm-badge blocked-badge">Block-Based Parallel</span>
                         </td>
-                        <td>{formatTime(data.blocked.time)}</td>
-                        <td>{data.blocked.speedup.toFixed(2)}x</td>
-                        <td>{(data.blocked.speedup / data.availableThreads * 100).toFixed(1)}%</td>
+                        <td>{formatTime(data.blocked?.time)}</td>
+                        <td>{data.blocked?.speedup?.toFixed(2) || '0.00'}x</td>
+                        <td>{data.blocked?.efficiency?.toFixed(2) || '0.00'}</td>
+                        <td>{formatEnergy(data.blocked?.energy)}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span className="algorithm-badge async-badge">Async Parallel</span>
+                        </td>
+                        <td>{formatTime(data.async?.time)}</td>
+                        <td>{data.async?.speedup?.toFixed(2) || '0.00'}x</td>
+                        <td>{data.async?.efficiency?.toFixed(2) || '0.00'}</td>
+                        <td>{formatEnergy(data.async?.energy)}</td>
                     </tr>
                 </tbody>
             </table>
@@ -59,6 +80,7 @@ function ResultTable({ data }) {
                     <li><strong>Çalışma Süresi:</strong> Algoritmanın tamamlanması için gereken süre (saniye)</li>
                     <li><strong>Hızlanma (Speedup):</strong> Sıralı algoritma süresinin paralel algoritma süresine oranı</li>
                     <li><strong>Verimlilik:</strong> Hızlanmanın kullanılan thread sayısına oranı (ideal değer: 100%)</li>
+                    <li><strong>Enerji Tüketimi:</strong> Algoritmanın çalışması sırasında harcanan enerji (Joule)</li>
                 </ul>
 
                 <button
@@ -187,6 +209,43 @@ function ResultTable({ data }) {
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="accordion-item">
+                                <h2 className="accordion-header">
+                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#asyncParallel">
+                                        <span className="algorithm-badge async-badge me-2">Async Parallel</span> Algoritması
+                                    </button>
+                                </h2>
+                                <div id="asyncParallel" className="accordion-collapse collapse">
+                                    <div className="accordion-body">
+                                        <p>Asenkron paralel algoritma, Task Parallel Library (TPL) kullanarak asenkron işlemleri yönetir:</p>
+                                        <pre className="bg-light p-2 rounded">
+                                            <code>
+                                                {'var tasks = new List<Task>();'}<br />
+                                                {'for (int t = 0; t < threadCount; t++) {'}<br />
+                                                {'  int threadId = t;'}<br />
+                                                {'  tasks.Add(Task.Run(() => {'}<br />
+                                                {'    int rowsPerThread = size / threadCount;'}<br />
+                                                {'    int startRow = threadId * rowsPerThread;'}<br />
+                                                {'    int endRow = (threadId == threadCount - 1) ? size : startRow + rowsPerThread;'}<br />
+                                                {'    for (int i = startRow; i < endRow; i++) {'}<br />
+                                                {'      for (int j = 0; j < size; j++) {'}<br />
+                                                {'        double sum = 0;'}<br />
+                                                {'        for (int k = 0; k < size; k++) {'}<br />
+                                                {'          sum += a[i, k] * b[k, j];'}<br />
+                                                {'        }'}<br />
+                                                {'        result[i, j] = sum;'}<br />
+                                                {'      }'}<br />
+                                                {'    }'}<br />
+                                                {'  }));'}<br />
+                                                {'}'}<br />
+                                                {'await Task.WhenAll(tasks);'}
+                                            </code>
+                                        </pre>
+                                        <p>Bu algoritma, her thread için ayrı bir Task oluşturur ve Task.WhenAll ile tüm işlemlerin tamamlanmasını bekler. Asenkron yapı sayesinde thread havuzu daha verimli kullanılır ve sistem kaynakları daha iyi yönetilir.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -194,8 +253,6 @@ function ResultTable({ data }) {
                 <div className="alert alert-secondary mt-3 small">
                     <strong>Matris Boyutu:</strong> {data.matrixSize} x {data.matrixSize} <br />
                     <strong>Kullanılabilir Thread Sayısı:</strong> {data.availableThreads} <br />
-                    <br />
-
                 </div>
             </div>
         </div>

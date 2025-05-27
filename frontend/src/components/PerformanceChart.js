@@ -23,10 +23,15 @@ function PerformanceChart({ data }) {
             name: 'Block-Based',
             süre: data.blocked.time,
             hızlanma: data.blocked.speedup
+        },
+        {
+            name: 'Async Parallel',
+            süre: data.async.time,
+            hızlanma: data.async.speedup
         }
     ];
 
-    const COLORS = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f'];
+    const COLORS = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6'];
 
     return (
         <div className="chart-wrapper">

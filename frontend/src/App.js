@@ -4,6 +4,7 @@ import MatrixForm from './components/MatrixForm';
 import PerformanceChart from './components/PerformanceChart';
 import ResultTable from './components/ResultTable';
 import ThreadComparisonChart from './components/ThreadComparisonChart';
+import EnergyChart from './components/EnergyChart';
 
 function App() {
     const [results, setResults] = useState(null);
@@ -19,43 +20,54 @@ function App() {
 
     // Tek algoritma sonucunu karşılaştırma formatına dönüştüren fonksiyon
     const convertToComparisonFormat = (singleResult) => {
-        // Base format - tüm değerleri sıfırla
         const comparisonData = {
             matrixSize: singleResult.size,
             availableThreads: singleResult.threadCount,
-            sequential: { time: 0, speedup: 0, efficiency: 0 },
-            parallel: { time: 0, speedup: 0, efficiency: 0 },
-            improved: { time: 0, speedup: 0, efficiency: 0 },
-            blocked: { time: 0, speedup: 0, efficiency: 0 }
+            sequential: { time: 0, speedup: 0, efficiency: 0, energy: 0 },
+            parallel: { time: 0, speedup: 0, efficiency: 0, energy: 0 },
+            improved: { time: 0, speedup: 0, efficiency: 0, energy: 0 },
+            blocked: { time: 0, speedup: 0, efficiency: 0, energy: 0 },
+            async: { time: 0, speedup: 0, efficiency: 0, energy: 0 }
         };
 
-        // Sadece çalıştırılan algoritmanın değerlerini ayarla
         if (singleResult.algorithm === 'sequential') {
             comparisonData.sequential = {
                 time: singleResult.executionTime,
                 speedup: 1.0,
-                efficiency: 100.0
+                efficiency: 100.0,
+                energy: singleResult.energyConsumption
             };
         }
         else if (singleResult.algorithm === 'basic_parallel') {
             comparisonData.parallel = {
                 time: singleResult.executionTime,
                 speedup: singleResult.executionTime > 0 ? comparisonData.sequential.time / singleResult.executionTime : 1.0,
-                efficiency: singleResult.executionTime > 0 ? (comparisonData.sequential.time / singleResult.executionTime) / singleResult.threadCount * 100 : 0
+                efficiency: singleResult.executionTime > 0 ? (comparisonData.sequential.time / singleResult.executionTime) / singleResult.threadCount * 100 : 0,
+                energy: singleResult.energyConsumption
             };
         }
         else if (singleResult.algorithm === 'improved_parallel') {
             comparisonData.improved = {
                 time: singleResult.executionTime,
                 speedup: singleResult.executionTime > 0 ? comparisonData.sequential.time / singleResult.executionTime : 1.0,
-                efficiency: singleResult.executionTime > 0 ? (comparisonData.sequential.time / singleResult.executionTime) / singleResult.threadCount * 100 : 0
+                efficiency: singleResult.executionTime > 0 ? (comparisonData.sequential.time / singleResult.executionTime) / singleResult.threadCount * 100 : 0,
+                energy: singleResult.energyConsumption
             };
         }
         else if (singleResult.algorithm === 'block_based') {
             comparisonData.blocked = {
                 time: singleResult.executionTime,
                 speedup: singleResult.executionTime > 0 ? comparisonData.sequential.time / singleResult.executionTime : 1.0,
-                efficiency: singleResult.executionTime > 0 ? (comparisonData.sequential.time / singleResult.executionTime) / singleResult.threadCount * 100 : 0
+                efficiency: singleResult.executionTime > 0 ? (comparisonData.sequential.time / singleResult.executionTime) / singleResult.threadCount * 100 : 0,
+                energy: singleResult.energyConsumption
+            };
+        }
+        else if (singleResult.algorithm === 'async_parallel') {
+            comparisonData.async = {
+                time: singleResult.executionTime,
+                speedup: singleResult.executionTime > 0 ? comparisonData.sequential.time / singleResult.executionTime : 1.0,
+                efficiency: singleResult.executionTime > 0 ? (comparisonData.sequential.time / singleResult.executionTime) / singleResult.threadCount * 100 : 0,
+                energy: singleResult.energyConsumption
             };
         }
 
@@ -71,7 +83,7 @@ function App() {
 
             if (params.mode === 'compare') {
                 // Tüm algoritmaları sırayla çalıştır
-                const algorithms = ['sequential', 'basic_parallel', 'improved_parallel', 'block_based'];
+                const algorithms = ['sequential', 'basic_parallel', 'improved_parallel', 'block_based', 'async_parallel'];
                 for (const algorithm of algorithms) {
                     const response = await fetch('/api/matrix/multiply', {
                         method: 'POST',
@@ -100,22 +112,32 @@ function App() {
                     sequential: {
                         time: results[0].executionTime,
                         speedup: 1.0,
-                        efficiency: 100.0
+                        efficiency: 100.0,
+                        energy: results[0].energyConsumption
                     },
                     parallel: {
                         time: results[1].executionTime,
                         speedup: results[0].executionTime / results[1].executionTime,
-                        efficiency: (results[0].executionTime / results[1].executionTime) / params.threads * 100
+                        efficiency: (results[0].executionTime / results[1].executionTime) / params.threads * 100,
+                        energy: results[1].energyConsumption
                     },
                     improved: {
                         time: results[2].executionTime,
                         speedup: results[0].executionTime / results[2].executionTime,
-                        efficiency: (results[0].executionTime / results[2].executionTime) / params.threads * 100
+                        efficiency: (results[0].executionTime / results[2].executionTime) / params.threads * 100,
+                        energy: results[2].energyConsumption
                     },
                     blocked: {
                         time: results[3].executionTime,
                         speedup: results[0].executionTime / results[3].executionTime,
-                        efficiency: (results[0].executionTime / results[3].executionTime) / params.threads * 100
+                        efficiency: (results[0].executionTime / results[3].executionTime) / params.threads * 100,
+                        energy: results[3].energyConsumption
+                    },
+                    async: {
+                        time: results[4].executionTime,
+                        speedup: results[0].executionTime / results[4].executionTime,
+                        efficiency: (results[0].executionTime / results[4].executionTime) / params.threads * 100,
+                        energy: results[4].energyConsumption
                     }
                 };
 
@@ -195,15 +217,23 @@ function App() {
                             <div className="row small text-muted">
                                 <div className="col">
                                     <div>Sequential: {formatTime(data.sequential.time)} s</div>
+                                    <div className="text-primary">Enerji: {data.sequential.energy?.toFixed(2) || '0.00'} J</div>
                                 </div>
                                 <div className="col">
                                     <div>Basic Parallel: {formatTime(data.parallel.time)} s</div>
+                                    <div className="text-primary">Enerji: {data.parallel.energy?.toFixed(2) || '0.00'} J</div>
                                 </div>
                                 <div className="col">
                                     <div>Improved Parallel: {formatTime(data.improved.time)} s</div>
+                                    <div className="text-primary">Enerji: {data.improved.energy?.toFixed(2) || '0.00'} J</div>
                                 </div>
                                 <div className="col">
                                     <div>Block-Based: {formatTime(data.blocked.time)} s</div>
+                                    <div className="text-primary">Enerji: {data.blocked.energy?.toFixed(2) || '0.00'} J</div>
+                                </div>
+                                <div className="col">
+                                    <div>Async Parallel: {formatTime(data.async.time)} s</div>
+                                    <div className="text-primary">Enerji: {data.async.energy?.toFixed(2) || '0.00'} J</div>
                                 </div>
                             </div>
                         </div>
@@ -212,6 +242,7 @@ function App() {
                             <p className="mb-1">Matris Boyutu: {data.matrixSize} x {data.matrixSize}</p>
                             <p className="mb-1">Çalışma Süresi: {formatTime(data.executionTime)} s</p>
                             <p className="mb-1">Hızlanma (Speedup): {data.speedup ? data.speedup.toFixed(2) : '1.00'}x</p>
+                            <p className="mb-1">Enerji Tüketimi: {data.energyConsumption?.toFixed(2) || '0.00'} J</p>
                             <p className="mb-0">Thread Sayısı: {data.threads || "Varsayılan"}</p>
                         </div>
                     )}
@@ -256,59 +287,35 @@ function App() {
                 </div>
 
                 <div className="col-md-7">
-                    <div className="section">
-                        <h2 className="title">Sonuçlar</h2>
-                        {loading && (
-                            <div className="loading">
-                                <div className="spinner-border text-primary" role="status">
-                                    <span className="visually-hidden">Yükleniyor...</span>
-                                </div>
-                                <span className="ms-2">Hesaplama yapılıyor...</span>
+                    {loading && (
+                        <div className="text-center my-5">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Yükleniyor...</span>
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        {error && (
-                            <div className="alert alert-danger" role="alert">
-                                {error}
+                    {error && (
+                        <div className="alert alert-danger" role="alert">
+                            {error}
+                        </div>
+                    )}
+
+                    {results && (
+                        <div className="section">
+                            <h2 className="title">Sonuçlar</h2>
+                            <ResultTable data={results} />
+                            <div className="mt-4">
+                                <PerformanceChart data={results} />
                             </div>
-                        )}
-
-                        {results && !loading && (
-                            <div className="result-section">
-                                {results.sequential && (
-                                    <>
-                                        <h3 className="subtitle">Algoritma Performansları</h3>
-                                        <PerformanceChart data={results} />
-                                        <ResultTable data={results} />
-
-                                        {results.threadComparison && results.threadComparison.length > 0 && (
-                                            <>
-                                                <h3 className="subtitle mt-4">Thread Karşılaştırması</h3>
-                                                <ThreadComparisonChart data={results.threadComparison} />
-                                            </>
-                                        )}
-                                    </>
-                                )}
-
-                                {!results.sequential && (
-                                    <>
-                                        <div className="alert alert-info">
-                                            <h4>{results.algorithm.toUpperCase()} algoritması çalıştırıldı</h4>
-                                            <p>Matris Boyutu: {results.matrixSize} x {results.matrixSize}</p>
-                                            <p>Çalışma Süresi: {formatTime(results.executionTime)} s</p>
-                                            <p>Hızlanma (Speedup): {results.speedup ? results.speedup.toFixed(2) : '1.00'}x</p>
-                                            <p>Thread Sayısı: {results.threads || "Varsayılan"}</p>
-                                        </div>
-
-                                        {/* Tek algoritma çalıştırıldığında da grafik göster */}
-                                        <h3 className="subtitle mt-4">Performans Gösterimi</h3>
-                                        <PerformanceChart data={convertToComparisonFormat(results)} />
-                                        <ResultTable data={convertToComparisonFormat(results)} />
-                                    </>
-                                )}
+                            <div className="mt-4">
+                                <ThreadComparisonChart data={results} />
                             </div>
-                        )}
-                    </div>
+                            <div className="mt-4">
+                                <EnergyChart data={results} />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
